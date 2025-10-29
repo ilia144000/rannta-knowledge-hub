@@ -1,4 +1,6 @@
-# RANNTA Tokenomics (v1.1)
+# RANNTA Tokenomics – Economic Architecture and Supply Mechanics
+
+This document defines the full economic structure of the RANNTA token, including total supply, burn mechanisms, distribution strategy, and treasury governance, designed to align economic incentives with long-term community resilience and field expansion.
 
 > Status: Public, factual, and versioned. Figures below reflect the latest community disclosure. Future updates will be tagged and archived.
 
