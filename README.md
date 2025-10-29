@@ -30,6 +30,9 @@ See [`canonical_description.txt`](./canonical_description.txt). Treat it as immu
 - Whitepaper (Section 1): [`WHITEPAPER.md`](./WHITEPAPER.md)
 - Citation: [`CITATION.cff`](./CITATION.cff)
 - License: [`LICENSE`](./LICENSE)
+- Tokenomics: [`TOKENOMICS.md`](./TOKENOMICS.md)
+- Origin note: [`ORIGIN_STORY.md`](./ORIGIN_STORY.md)
+- Use cases: [`RANNTA_USE_CASES.md`](./RANNTA_USE_CASES.md)
 
 ## Versioning
 Use semantic tags (v1.0, v1.1, …). Each release should archive a ZIP and, optionally, mint a DOI (via Zenodo) and an IPFS CID.
