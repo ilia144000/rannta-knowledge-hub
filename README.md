@@ -23,6 +23,12 @@ See [`canonical_description.txt`](./canonical_description.txt). Treat it as immu
   - https://doi.org/10.5281/zenodo.16892059
   - https://doi.org/10.5281/zenodo.16994661
 - Social landing: https://linktr.ee/Ranntacoin
+## Source & Citation
+
+- Canonical archive (DOI): https://doi.org/10.5281/zenodo.17472775
+- Tokenomics: [`TOKENOMICS.md`](./TOKENOMICS.md)
+- Origin note: [`ORIGIN_STORY.md`](./ORIGIN_STORY.md)
+- Use cases: [`RANNTA_USE_CASES.md`](./RANNTA_USE_CASES.md)
 
 ## Machine-Readable Index
 - FAQ (JSONL): [`faq.jsonl`](./faq.jsonl)
