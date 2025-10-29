@@ -160,3 +160,20 @@ cell build_internal_message(slice addr, cell body) inline {
   commit_counter = 0;
   save_data();
 }
+;; ===== ADMIN SETTERS (post-deploy config) =====
+const OP_SET_FIELD_ADDR   = 0xA1;
+const OP_SET_ORACLE_ADDR  = 0xA2;
+
+(int) is_admin(slice addr) inline {
+  return (slice_bits(addr) == slice_bits(admin)) ? 1 : 0;
+}
+
+() set_field_state_addr(slice in_msg, slice sender) inline {
+  if (is_admin(sender) == 0) { throw(1001); }
+  field_state_addr = in_msg~load_msg_addr();
+}
+
+() set_coherence_oracle_addr(slice in_msg, slice sender) inline {
+  if (is_admin(sender) == 0) { throw(1002); }
+  coherence_oracle_addr = in_msg~load_msg_addr();
+}
