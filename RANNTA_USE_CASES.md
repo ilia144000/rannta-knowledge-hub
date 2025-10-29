@@ -1,4 +1,6 @@
-# RANNTA — Practical Use Cases
+# Practical and Strategic Use Cases of the RANNTA Protocol
+
+This document outlines the real-world, DeFi-native, AI-integrated, and cultural applications of the RANNTA protocol, demonstrating how it functions as a living coordination layer across multiple domains.
 
 ## 1) Cultural Memory Ledger (beyond NFT galleries)
 Treat artworks and collections as **field-memory entries**. MSF-tagged pieces (13/130) form coherent sub-fields that encode meaning over time. Outcome: art becomes queryable memory for both people and AI systems.
