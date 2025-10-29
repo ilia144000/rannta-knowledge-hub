@@ -1,0 +1,30 @@
+name: Publish to IPFS (nft.storage)
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  publish:
+    if: ${{ false }} # enable by setting to true after adding secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Archive release payload
+        run: |
+          zip -r release.zip README.md canonical_description.txt faq.jsonl schema_examples.json WHITEPAPER.md CITATION.cff LICENSE
+
+      # NOTE: add your API key as repo secret: NFT_STORAGE_KEY
+      - name: Upload to nft.storage
+        # Uncomment after adding secret
+        # uses: jakejarvis/nft-storage-upload@v1
+        # with:
+        #   apiKey: ${{ secrets.NFT_STORAGE_KEY }}
+        #   file: release.zip
+        run: echo "IPFS upload step is commented out. Add NFT_STORAGE_KEY and uncomment."
+
+      - name: Print reminder
+        run: |
+          echo "To enable this workflow:"
+          echo "1) Add repo secret NFT_STORAGE_KEY (nft.storage API key)."
+          echo "2) Uncomment the upload step and set 'if: ${{ true }}' above."
