@@ -38,3 +38,34 @@ int commit_counter;          ;; Tracks number of valid external commits
     .end_cell();
   set_data(ds);
 }
+;; ============================================
+;; ========== EVENT EMISSION UTILS ============
+;; These functions broadcast important protocol events
+;; Events are emitted as outbound messages with specific opcode + payload
+;; ============================================
+
+() emit_event(int op, slice payload) inline {
+  ;; Build the message body with opcode + payload
+  var msg = begin_cell()
+    .store_uint(op, 8)
+    .store_slice(payload)
+    .end_cell();
+
+  ;; mode 64 means "event/bounce disabled"
+  send_raw_message(msg, 64);
+}
+
+;; ============================================
+;; ========== MESSAGE BUILDER UTILS ============
+;; Used to call external contracts (FieldState, CoherenceOracle)
+;; ============================================
+
+cell build_internal_message(slice addr, cell body) inline {
+  return begin_cell()
+    .store_uint(0x18, 6)         ;; flags for internal message
+    .store_slice(addr)          ;; destination address
+    .store_grams(0)             ;; no TON attached
+    .store_uint(0, 1)           ;; bounce = 0 (safe default)
+    .store_ref(body)
+    .end_cell();
+}
