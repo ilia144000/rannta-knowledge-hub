@@ -122,3 +122,41 @@ cell build_internal_message(slice addr, cell body) inline {
     .end_cell();
   emit_event(OP_ENTANGLEMENT_APPLY, payload);
 }
+;; ============================================
+;; ========== MAIN DISPATCHER ================
+;; Routes incoming messages based on opcode
+;; ============================================
+
+() recv_internal(slice in_msg, int msg_value, cell msg_cell) impure {
+  load_data();
+
+  var op = in_msg~load_uint(8);
+
+  if (op == OP_EXTERNAL_COMMIT) {
+    receive_external_commit(in_msg);
+  } elseif (op == OP_ENTANGLEMENT_APPLY) {
+    apply_entanglement(in_msg);
+  } else {
+    ;; Unknown opcode - ignore or extend in future
+  }
+
+  save_data();
+}
+
+() recv_external(slice in_msg) impure {
+  ;; This can be extended if external messages are allowed
+  ;; Currently not used
+}
+
+;; ============================================
+;; ========== INIT FUNCTION ===================
+;; Called once to set initial contract state
+;; ============================================
+
+() init(slice in_msg, int msg_value, cell msg_cell, slice initial_admin, slice fs_addr, slice oracle_addr) impure {
+  admin = initial_admin;
+  field_state_addr = fs_addr;
+  coherence_oracle_addr = oracle_addr;
+  commit_counter = 0;
+  save_data();
+}
