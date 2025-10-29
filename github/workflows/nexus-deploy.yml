@@ -1,0 +1,25 @@
+name: Nexus Testnet Deploy
+on: { workflow_dispatch: {} }
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: |
+          npm i -g @ton-community/blueprint
+          npm i
+      - name: Import testnet key
+        env: { TON_SEED: ${{ secrets.TON_TESTNET_MNEMONIC }} }
+        run: |
+          mkdir -p ~/.config/blueprint
+          echo "$TON_SEED" | blueprint keys import --network testnet --stdin
+      - name: Build
+        run: blueprint build
+      - name: Patch ADMIN and Deploy
+        env: { ADMIN_ADDR: ${{ secrets.TON_TESTNET_ADMIN }} }
+        run: |
+          sed -i 's#Address.parse("YOUR_TESTNET_WALLET_ADDRESS")#Address.parse("'$ADMIN_ADDR'")#' scripts/deployNexus.ts
+          blueprint run scripts/deployNexus.ts --network testnet
