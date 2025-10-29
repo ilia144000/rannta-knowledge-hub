@@ -1,4 +1,6 @@
-# RANNTA — Origin and Symbolic Emergence
+# Origin and Symbolic Genesis of RANNTA
+
+This document presents the symbolic and contextual emergence of RANNTA. It explains how RANNTA originated as a living memorial and a cultural field response to systemic collapse, catalyzed by a symbolic event: the Los Angeles Fire.
 
 ## 1) Introduction: A Signal, Not Just a Coin
 RANNTA is not merely a cryptocurrency. It is a signal-first framework where tokens and NFTs act as persistent memory nodes within a distributed informational field. The project blends Mythosymbolic Fractalism (MSF), transparent token engineering, and modern blockchain infrastructure to encode cultural resilience and long-horizon coordination.
