@@ -69,3 +69,56 @@ cell build_internal_message(slice addr, cell body) inline {
     .store_ref(body)
     .end_cell();
 }
+;; ============================================
+;; ========== CORE FUNCTIONS ==================
+;; These implement the primary Nexus logic
+;; ============================================
+
+(int) receive_external_commit(slice in_msg) inline {
+  ;; Parse input parameters
+  var source_chain = in_msg~load_uint(32);      ;; e.g., 1=TON, 2=TAO, 3=Polygon
+  var commitment_hash = in_msg~load_slice();    ;; hash or identifier of external state
+
+  ;; Update commit counter
+  commit_counter += 1;
+
+  ;; Forward commit to FieldState contract
+  var body = begin_cell()
+    .store_uint(0x21, 8)        ;; opcode for "register_commit"
+    .store_slice(commitment_hash)
+    .end_cell();
+  var msg = build_internal_message(field_state_addr, body);
+  send_raw_message(msg, 1);
+
+  ;; Emit event
+  var payload = begin_cell()
+    .store_int(commit_counter, 32)
+    .store_uint(source_chain, 32)
+    .store_slice(commitment_hash)
+    .end_cell();
+  emit_event(OP_EXTERNAL_COMMIT, payload);
+
+  return commit_counter;
+}
+
+() apply_entanglement(slice in_msg) inline {
+  ;; Parse entanglement parameters
+  var target_shard = in_msg~load_uint(16);   ;; which shard/node to apply delta to
+  var delta_energy = in_msg~load_int(64);    ;; signed energy adjustment
+
+  ;; Forward to CoherenceOracle
+  var body = begin_cell()
+    .store_uint(0x31, 8)         ;; opcode for oracle apply_delta
+    .store_uint(target_shard, 16)
+    .store_int(delta_energy, 64)
+    .end_cell();
+  var msg = build_internal_message(coherence_oracle_addr, body);
+  send_raw_message(msg, 1);
+
+  ;; Emit event
+  var payload = begin_cell()
+    .store_uint(target_shard, 16)
+    .store_int(delta_energy, 64)
+    .end_cell();
+  emit_event(OP_ENTANGLEMENT_APPLY, payload);
+}
