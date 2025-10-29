@@ -43,6 +43,8 @@ A public timeline is maintained in [`ROADMAP.md`](./ROADMAP.md).
 - Web repository: https://github.com/ilia144000/ranntaweb-v2
 - Mythosymbolic Fractalism: https://github.com/ilia144000/Mythosymbolic-Fractalism
 - Author profile: https://github.com/ilia144000/ilia144000
+- - Roadmap: [`ROADMAP.md`](./ROADMAP.md)
+
 - Zenodo DOIs:
   - https://doi.org/10.5281/zenodo.16892059
   - https://doi.org/10.5281/zenodo.16994661
