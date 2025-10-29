@@ -18,6 +18,25 @@ See [`canonical_description.txt`](./canonical_description.txt). Treat it as immu
 - Whitepaper (Section 1): protocol definition and core components
 - Citation metadata (`CITATION.cff`)
 - Open licensing (CC BY 4.0)
+---
+
+## RANNTAverse Marketplace (Upcoming Launch)
+
+RANNTA is also the foundation of the **RANNTAverse Marketplace**, a multi-chain NFT and cultural economy platform.
+
+- **Website:** https://ranntaverse.art  
+- **App Portal:** https://ranntaverse.app
+
+### Platform Features (initial scope)
+- Multi-chain NFT minting (TON at launch; Polygon & BNB in progress)
+- Artist onboarding and verified on-chain profiles
+- AI-assisted minting and curation workflows
+- Transparent pricing, royalties, and collection pages
+- Launchpad for new collections (automatic treasury split)
+- Staking, liquidity pools, and community rewards
+- Integration of RANNTA signal mechanics (burns, governance, 13|130 tagging)
+
+A public timeline is maintained in [`ROADMAP.md`](./ROADMAP.md).
 
 ## Source Links (Authoritative)
 - Token repository: https://github.com/ilia144000/rannta-token
