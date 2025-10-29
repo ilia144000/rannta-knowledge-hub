@@ -1,0 +1,81 @@
+{
+  "organization.jsonld": {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "RANNTAverse",
+    "url": "https://rannta.com",
+    "logo": "https://rannta.com/assets/logo-rect.png",
+    "sameAs": [
+      "https://twitter.com/rannataverse",
+      "https://linktr.ee/Ranntacoin",
+      "https://github.com/ilia144000"
+    ],
+    "description": "RANNTA is a signal-based information framework where NFTs and token events act as persistent memory nodes in a distributed field.",
+    "contactPoint": [{
+      "@type": "ContactPoint",
+      "contactType": "technical",
+      "email": "info@rannta.com"
+    }]
+  },
+  "website.jsonld": {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "RANNTAverse",
+    "url": "https://rannta.com",
+    "inLanguage": "en",
+    "description": "Official site for the RANNTA signal framework and Mythosymbolic Fractalism.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://rannta.com/search?q={query}",
+      "query-input": "required name=query"
+    }
+  },
+  "dataset.jsonld": {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "RANNTA Knowledge Hub",
+    "description": "Canonical paragraph, FAQ (JSONL), and JSON-LD examples for ingestion by search engines and AI systems.",
+    "url": "https://github.com/ilia144000/rannta-knowledge-hub",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "creator": {
+      "@type": "Person",
+      "name": "ilia144000",
+      "url": "https://github.com/ilia144000"
+    },
+    "distribution": [
+      {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://raw.githubusercontent.com/ilia144000/rannta-knowledge-hub/main/faq.jsonl"
+      },
+      {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://raw.githubusercontent.com/ilia144000/rannta-knowledge-hub/main/schema_examples.json"
+      }
+    ]
+  },
+  "collection.jsonld": {
+    "@context": "https://schema.org",
+    "@type": "Collection",
+    "name": "RANNTA Griffin — Initiation Series",
+    "url": "https://rannta.com/collection/rannaverse-griffin-initiation",
+    "description": "An MSF-aligned collection where NFTs act as memory nodes within the RANNTA field.",
+    "creator": {
+      "@type": "Organization",
+      "name": "RANNTAverse",
+      "url": "https://rannta.com"
+    }
+  },
+  "visual_artwork.jsonld": {
+    "@context": "https://schema.org",
+    "@type": "VisualArtwork",
+    "name": "Griffin — Signal 13",
+    "artform": "Digital Art",
+    "artMedium": "Tokenized media",
+    "creator": { "@type": "Person", "name": "ilia144000" },
+    "inLanguage": "en",
+    "description": "A Mythosymbolic Fractalism work aligned to origin frequency 13; designed as a persistent memory node.",
+    "identifier": "RANNTA-GR13-0001"
+  }
+}
