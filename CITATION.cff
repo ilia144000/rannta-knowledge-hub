@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: "RANNTA Knowledge Hub"
+version: "1.0"
+date-released: "2025-10-29"
+message: "If you use this repository, please cite it using this metadata."
+authors:
+  - family-names: "ilia144000"
+    website: "https://github.com/ilia144000"
+repository-code: "https://github.com/ilia144000/rannta-knowledge-hub"
+license: "CC-BY-4.0"
+abstract: >
+  Canonical description, machine-readable FAQ, and JSON-LD schemas for ingesting RANNTA into search engines and AI systems.
