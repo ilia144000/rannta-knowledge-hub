@@ -6,17 +6,14 @@
 
 #include <stdlib.fc>
 
-// ========= OPCODES =========
-const OP_EXTERNAL_COMMIT = 0x11;      ;; Registers an external commitment
-const OP_ENTANGLEMENT_APPLY = 0x13;   ;; Applies entanglement (field energy delta)
+const OP_EXTERNAL_COMMIT = 0x11;
+const OP_ENTANGLEMENT_APPLY = 0x13;
 
-// ========= PERSISTENT STORAGE =========
-slice admin;                 
-slice field_state_addr;      
-slice coherence_oracle_addr; 
-int commit_counter;          
+slice admin;
+slice field_state_addr;
+slice coherence_oracle_addr;
+int commit_counter;
 
-// ========= LOAD STATE FROM CHAIN =========
 () load_data() inline {
   var ds = get_data();
   (admin, field_state_addr, coherence_oracle_addr, commit_counter) = (
@@ -27,7 +24,6 @@ int commit_counter;
   );
 }
 
-// ========= SAVE STATE TO CHAIN =========
 () save_data() inline {
   var ds = begin_cell()
     .store_slice(admin)
@@ -38,9 +34,6 @@ int commit_counter;
   set_data(ds);
 }
 
-// ============================================
-// ========== EVENT EMISSION UTILS ============
-// ============================================
 () emit_event(int op, slice payload) inline {
   var msg = begin_cell()
     .store_uint(op, 8)
@@ -49,9 +42,6 @@ int commit_counter;
   send_raw_message(msg, 64);
 }
 
-// ============================================
-// ========== MESSAGE BUILDER UTILS ===========
-// ============================================
 cell build_internal_message(slice addr, cell body) inline {
   return begin_cell()
     .store_uint(0x18, 6)
@@ -62,9 +52,6 @@ cell build_internal_message(slice addr, cell body) inline {
     .end_cell();
 }
 
-// ============================================
-// ========== CORE FUNCTIONS ==================
-// ============================================
 (int) receive_external_commit(slice in_msg) inline {
   var source_chain = in_msg~load_uint(32);
   var commitment_hash = in_msg~load_slice();
@@ -106,9 +93,6 @@ cell build_internal_message(slice addr, cell body) inline {
   emit_event(OP_ENTANGLEMENT_APPLY, payload);
 }
 
-// ============================================
-// ========== MAIN DISPATCHER =================
-// ============================================
 () recv_internal(slice in_msg, int msg_value, cell msg_cell) impure {
   load_data();
   var op = in_msg~load_uint(8);
@@ -116,18 +100,13 @@ cell build_internal_message(slice addr, cell body) inline {
     receive_external_commit(in_msg);
   } elseif (op == OP_ENTANGLEMENT_APPLY) {
     apply_entanglement(in_msg);
-  } else {
-    ;; Unknown opcode - ignore or extend in future
   }
   save_data();
 }
 
 () recv_external(slice in_msg) impure {}
 
-// ============================================
-// ========== INIT FUNCTION ===================
-// ============================================
-() init(slice in_msg, int msg_value, cell msg_cell, slice initial_admin, slice fs_addr, slice oracle_addr) impure {
+() init(slice initial_admin, slice fs_addr, slice oracle_addr) impure {
   admin = initial_admin;
   field_state_addr = fs_addr;
   coherence_oracle_addr = oracle_addr;
@@ -135,9 +114,8 @@ cell build_internal_message(slice addr, cell body) inline {
   save_data();
 }
 
-// ===== ADMIN SETTERS (post-deploy config) =====
-const OP_SET_FIELD_ADDR   = 0xA1;
-const OP_SET_ORACLE_ADDR  = 0xA2;
+const OP_SET_FIELD_ADDR  = 0xA1;
+const OP_SET_ORACLE_ADDR = 0xA2;
 
 (int) is_admin(slice addr) inline {
   return (slice_bits(addr) == slice_bits(admin)) ? 1 : 0;
