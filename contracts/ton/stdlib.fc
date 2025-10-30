@@ -1,5 +1,14 @@
-;; Minimal stdlib replacement
-() throw(int code) impure { throw(code); }
-(cell) begin_cell() inline { return begin_cell(); }
-(slice) get_data() impure { return get_data(); }
-(int) set_data(cell c) impure { set_data(c); return 1; }
+;; Minimal stdlib.fc for TON Testnet IDE
+
+builtin cell begin_cell();
+builtin cell end_cell();
+builtin builder store_uint(builder b, int x, int bits);
+builtin builder store_int(builder b, int x, int bits);
+builtin builder store_slice(builder b, slice s);
+builtin builder store_ref(builder b, cell c);
+builtin builder store_grams(builder b, int v);
+builtin () send_raw_message(cell msg, int mode);
+builtin slice get_data();
+builtin () set_data(cell d) impure;
+
+() throw(int code) impure asm "THROW";
