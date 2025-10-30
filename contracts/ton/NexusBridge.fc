@@ -1,23 +1,22 @@
-;; ============================================
-;; File: contracts/ton/NexusBridge.fc
-;; Purpose: RANNTA Nexus Bridge Contract (Stage 3 Initiation)
-;; Language: English Only (Global Standard)
-;; ============================================
+// ============================================
+// File: contracts/ton/NexusBridge.fc
+// Purpose: RANNTA Nexus Bridge Contract (Stage 3 Initiation)
+// Language: English Only (Global Standard)
+// ============================================
 
 #include <stdlib.fc>
 
-;; ========= OPCODES =========
+// ========= OPCODES =========
 const OP_EXTERNAL_COMMIT = 0x11;      ;; Registers an external commitment
 const OP_ENTANGLEMENT_APPLY = 0x13;   ;; Applies entanglement (field energy delta)
 
-;; ========= PERSISTENT STORAGE =========
-;; These fields define the contract state stored on-chain
-slice admin;                 ;; Primary controller (root authority)
-slice field_state_addr;      ;; FieldState contract address (core RANNTA field)
-slice coherence_oracle_addr; ;; CoherenceOracle contract address (energy and state calculations)
-int commit_counter;          ;; Tracks number of valid external commits
+// ========= PERSISTENT STORAGE =========
+slice admin;                 
+slice field_state_addr;      
+slice coherence_oracle_addr; 
+int commit_counter;          
 
-;; ========= LOAD STATE FROM CHAIN =========
+// ========= LOAD STATE FROM CHAIN =========
 () load_data() inline {
   var ds = get_data();
   (admin, field_state_addr, coherence_oracle_addr, commit_counter) = (
@@ -28,7 +27,7 @@ int commit_counter;          ;; Tracks number of valid external commits
   );
 }
 
-;; ========= SAVE STATE TO CHAIN =========
+// ========= SAVE STATE TO CHAIN =========
 () save_data() inline {
   var ds = begin_cell()
     .store_slice(admin)
@@ -38,59 +37,46 @@ int commit_counter;          ;; Tracks number of valid external commits
     .end_cell();
   set_data(ds);
 }
-;; ============================================
-;; ========== EVENT EMISSION UTILS ============
-;; These functions broadcast important protocol events
-;; Events are emitted as outbound messages with specific opcode + payload
-;; ============================================
 
+// ============================================
+// ========== EVENT EMISSION UTILS ============
+// ============================================
 () emit_event(int op, slice payload) inline {
-  ;; Build the message body with opcode + payload
   var msg = begin_cell()
     .store_uint(op, 8)
     .store_slice(payload)
     .end_cell();
-
-  ;; mode 64 means "event/bounce disabled"
   send_raw_message(msg, 64);
 }
 
-;; ============================================
-;; ========== MESSAGE BUILDER UTILS ============
-;; Used to call external contracts (FieldState, CoherenceOracle)
-;; ============================================
-
+// ============================================
+// ========== MESSAGE BUILDER UTILS ===========
+// ============================================
 cell build_internal_message(slice addr, cell body) inline {
   return begin_cell()
-    .store_uint(0x18, 6)         ;; flags for internal message
-    .store_slice(addr)          ;; destination address
-    .store_grams(0)             ;; no TON attached
-    .store_uint(0, 1)           ;; bounce = 0 (safe default)
+    .store_uint(0x18, 6)
+    .store_slice(addr)
+    .store_grams(0)
+    .store_uint(0, 1)
     .store_ref(body)
     .end_cell();
 }
-;; ============================================
-;; ========== CORE FUNCTIONS ==================
-;; These implement the primary Nexus logic
-;; ============================================
 
+// ============================================
+// ========== CORE FUNCTIONS ==================
+// ============================================
 (int) receive_external_commit(slice in_msg) inline {
-  ;; Parse input parameters
-  var source_chain = in_msg~load_uint(32);      ;; e.g., 1=TON, 2=TAO, 3=Polygon
-  var commitment_hash = in_msg~load_slice();    ;; hash or identifier of external state
-
-  ;; Update commit counter
+  var source_chain = in_msg~load_uint(32);
+  var commitment_hash = in_msg~load_slice();
   commit_counter += 1;
 
-  ;; Forward commit to FieldState contract
   var body = begin_cell()
-    .store_uint(0x21, 8)        ;; opcode for "register_commit"
+    .store_uint(0x21, 8)
     .store_slice(commitment_hash)
     .end_cell();
   var msg = build_internal_message(field_state_addr, body);
   send_raw_message(msg, 1);
 
-  ;; Emit event
   var payload = begin_cell()
     .store_int(commit_counter, 32)
     .store_uint(source_chain, 32)
@@ -102,36 +88,30 @@ cell build_internal_message(slice addr, cell body) inline {
 }
 
 () apply_entanglement(slice in_msg) inline {
-  ;; Parse entanglement parameters
-  var target_shard = in_msg~load_uint(16);   ;; which shard/node to apply delta to
-  var delta_energy = in_msg~load_int(64);    ;; signed energy adjustment
+  var target_shard = in_msg~load_uint(16);
+  var delta_energy = in_msg~load_int(64);
 
-  ;; Forward to CoherenceOracle
   var body = begin_cell()
-    .store_uint(0x31, 8)         ;; opcode for oracle apply_delta
+    .store_uint(0x31, 8)
     .store_uint(target_shard, 16)
     .store_int(delta_energy, 64)
     .end_cell();
   var msg = build_internal_message(coherence_oracle_addr, body);
   send_raw_message(msg, 1);
 
-  ;; Emit event
   var payload = begin_cell()
     .store_uint(target_shard, 16)
     .store_int(delta_energy, 64)
     .end_cell();
   emit_event(OP_ENTANGLEMENT_APPLY, payload);
 }
-;; ============================================
-;; ========== MAIN DISPATCHER ================
-;; Routes incoming messages based on opcode
-;; ============================================
 
+// ============================================
+// ========== MAIN DISPATCHER =================
+// ============================================
 () recv_internal(slice in_msg, int msg_value, cell msg_cell) impure {
   load_data();
-
   var op = in_msg~load_uint(8);
-
   if (op == OP_EXTERNAL_COMMIT) {
     receive_external_commit(in_msg);
   } elseif (op == OP_ENTANGLEMENT_APPLY) {
@@ -139,20 +119,14 @@ cell build_internal_message(slice addr, cell body) inline {
   } else {
     ;; Unknown opcode - ignore or extend in future
   }
-
   save_data();
 }
 
-() recv_external(slice in_msg) impure {
-  ;; This can be extended if external messages are allowed
-  ;; Currently not used
-}
+() recv_external(slice in_msg) impure {}
 
-;; ============================================
-;; ========== INIT FUNCTION ===================
-;; Called once to set initial contract state
-;; ============================================
-
+// ============================================
+// ========== INIT FUNCTION ===================
+// ============================================
 () init(slice in_msg, int msg_value, cell msg_cell, slice initial_admin, slice fs_addr, slice oracle_addr) impure {
   admin = initial_admin;
   field_state_addr = fs_addr;
@@ -160,7 +134,8 @@ cell build_internal_message(slice addr, cell body) inline {
   commit_counter = 0;
   save_data();
 }
-;; ===== ADMIN SETTERS (post-deploy config) =====
+
+// ===== ADMIN SETTERS (post-deploy config) =====
 const OP_SET_FIELD_ADDR   = 0xA1;
 const OP_SET_ORACLE_ADDR  = 0xA2;
 
