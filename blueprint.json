@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "description": "RANNTA Nexus Bridge Contract — Stage 3 Initiation",
+  "contracts": {
+    "NexusBridge": {
+      "path": "contracts/ton/NexusBridge.fc",
+      "init": true
+    }
+  },
+  "scripts": {
+    "deploy": "scripts/deploy.ts"
+  }
+}
