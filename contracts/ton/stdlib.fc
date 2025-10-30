@@ -1,0 +1,5 @@
+;; Minimal stdlib replacement
+() throw(int code) impure { throw(code); }
+(cell) begin_cell() inline { return begin_cell(); }
+(slice) get_data() impure { return get_data(); }
+(int) set_data(cell c) impure { set_data(c); return 1; }
