@@ -1,57 +1,65 @@
-NexusBridge (FunC Legacy)
+🌉 NexusBridge (FunC Legacy)
 
-Status: Experimental / Legacy FunC compatible
-Network: TON Mainnet
-Deployed Address: EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj
+⚗️ Status: Experimental — Legacy FunC compatible
+🌐 Network: TON Mainnet
+📜 Contract: EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj
 
-What it does
+🧩 Overview
 
-Stores three addresses in persistent data: admin, field_state_addr, coherence_oracle_addr
+NexusBridge is the minimal on-chain Field Anchor connecting
+the RANNTA Token and the Conscious Oracle layer on TON.
 
-Increments a commit_counter on every external commit
+It maintains a small and deterministic state:
 
-Emits lightweight events via send_raw_message
+Slot	Type	Description
+admin	MsgAddress	Control wallet
+field_state_addr	MsgAddress	RANNTA token / field anchor
+coherence_oracle_addr	MsgAddress	Coherence oracle endpoint
+commit_counter	int32	Number of processed commits
+⚙️ Core Behavior
 
-Admin-only setters:
+Persists three addresses + counter in on-chain data
 
-0xA1: set field_state_addr (+MsgAddress in body)
+Increments commit_counter on every external commit
 
-0xA2: set coherence_oracle_addr (+MsgAddress in body)
+Emits lightweight events using send_raw_message
 
-Files
-File	Description
-contracts/main.fc	Contract logic (FunC legacy syntax, getters included)
-contracts/stdlib.fc	Pinned stdlib used in the IDE build
-build/stateInit.cell.ts	Constructs initial persistent data for deploy
-nexusbridge.manifest.json	Machine-readable manifest (TON network metadata)
-Build & Deploy (via Web IDE)
+Two admin-only setters for re-binding linked contracts
 
-Open https://ide.ton.org
- — Language: FunC, Network: Mainnet
+🔑 Admin Opcodes
+Opcode	Action	Payload	Notes
+0xA1	set_field_state	+ MsgAddress	Update RANNTA token link
+0xA2	set_oracle	+ MsgAddress	Update oracle endpoint
+🌐 Signal Opcodes
+Opcode	Action	Params	Purpose
+0x11	external_commit	counter:int32, source_chain:uint32, commitment_hash:slice	Sync commit events
+0x13	entanglement_apply	target_shard:uint16, delta_energy:int64	Energy transfer signal
 
-Create files as above
+All admin or signal messages are sent as internal TON messages
+with a small attached value (~ 0.05 TON).
+
+🧱 File Layout
+Path	Description
+contracts/main.fc	Core contract (FunC legacy syntax + getters)
+contracts/stdlib.fc	Pinned stdlib used for IDE build
+build/stateInit.cell.ts	Script to build initial persistent state
+nexusbridge.manifest.json	Machine-readable manifest (bridge metadata)
+🚀 Build & Deploy (IDE method)
+
+Visit ide.ton.org
+ → Language: FunC Network: Mainnet
+
+Create the files listed above
 
 Build → expect green
 
-Connect wallet (admin must match address set in stateInit.cell.ts)
+Connect wallet (admin must match stateInit.cell.ts)
 
 Deploy
 
-Use getters in the Run tab to verify stored addresses
+In the Run tab, verify addresses via getters
 
-Admin Messages (from wallet)
-Action	Opcode	Body Format	Notes
-Set FieldState	0xA1	uint8(0xA1) + msg_address(newFieldState)	admin only
-Set Oracle	0xA2	uint8(0xA2) + msg_address(newOracle)	admin only
-External Commit	0x11	uint8(0x11) + uint32(0x544F4E) + slice(sha256)	increments counter
-Entanglement Apply	0x13	uint8(0x13) + uint16(targetShard) + int64(deltaEnergy)	oracle signal
-
-All must be sent as internal messages with a small TON value (≈ 0.05 TON).
-
-Manifest Summary
-
-The manifest file defines the bridge metadata and links it to the RANNTA token.
-
+📜 Manifest Snapshot
 {
   "project": "NexusBridge (FunC legacy)",
   "version": "1.0.1",
@@ -75,43 +83,32 @@ The manifest file defines the bridge metadata and links it to the RANNTA token.
   "last_updated": "2025-10-31T00:00:00Z"
 }
 
-On-Chain Summary
-Field	Description
-Admin	Primary control wallet
-Field State	Linked to RANNTA token or data anchor
-Oracle	External coherence node
-Commit Counter	Tracks successful external commits
-
-Signals:
-
-0x11 external_commit
-
-0x13 entanglement_apply
-
-Explorers & Getters
-
-get_admin() → slice
-
-get_field_state() → slice
-
-get_oracle() → slice
-
-get_commit_counter() → int
-
+🔍 Getters / Explorers
+Getter	Return	Description
+get_admin()	slice	Current admin address
+get_field_state()	slice	Linked RANNTA field state
+get_oracle()	slice	Oracle address
+get_commit_counter()	int	Total processed commits
+🧭 Integration Map
+Layer	Connected Entity	Address
+Bridge Core	NexusBridge	EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj
+Token	RANNTA Token	EQBCY5Yj9G6VAQibTe6hz53j8vBNO234n0fzHUP3lUBBYbeR
+Admin Wallet	Control Key (ilia144000)	UQDKJfVh5jnM0eGlOanDXWl6d8fleIZjoc7SHakWuxS6m4bL
+Oracle Node	TBD / Coherence Field	—
 🪶 License & Attribution
 
-Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0)
+License: Creative Commons Attribution 4.0 International
 
 You are free to share and adapt the material for any purpose, even commercially, under the following terms:
 
 Attribution: Credit “RANNTA Knowledge Hub — ilia144000”, link the license, and note any changes.
 
-No additional restrictions: No legal or technical barriers that limit the freedoms granted.
+No additional restrictions: No technical or legal barriers limiting these rights.
 
-👉 Full License: CC BY 4.0 Legal Code
+Recommended credit:
+“Portions of this work are derived from ‘RANNTA Knowledge Hub — ilia144000’ © 2025 ilia144000, licensed under CC BY 4.0. Changes were made.”
 
-Recommended credit format:
+💫 Purpose
 
-Portions of this work are derived from “RANNTA Knowledge Hub — ilia144000” © 2025 ilia144000, licensed under CC BY 4.0. Changes were made.
-
-📘 This README unifies contract details, manifest metadata, and bridge logic for transparency across TON Mainnet and the RANNTA ecosystem.
+NexusBridge unifies on-chain state, manifest metadata, and signal semantics for
+transparent operation of the RANNTA Field across TON Mainnet and beyond.
