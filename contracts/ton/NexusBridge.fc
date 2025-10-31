@@ -1,126 +1,213 @@
-#include <stdlib.fc>
+#include "stdlib.fc"
 
-const OP_EXTERNAL_COMMIT = 0x11;
-const OP_ENTANGLEMENT_APPLY = 0x13;
+;; =========================
+;; NexusBridge (FunC legacy)
+;; =========================
+;; - No global vars
+;; - No const/define
+;; - No multi-value return types in signature
+;; - Uses `tuple` as return type, unpack with FIRST/SECOND/THIRD/FOURTH
 
-slice admin;
-slice field_state_addr;
-slice coherence_oracle_addr;
-int commit_counter;
+;; --------- STATE IO ---------
 
-() load_data() inline {
+tuple load_state() inline {
   var ds = get_data();
-  (admin, field_state_addr, coherence_oracle_addr, commit_counter) = (
-    ds~load_msg_addr(),
-    ds~load_msg_addr(),
-    ds~load_msg_addr(),
-    ds~load_int(32)
-  );
+  var a = ds~load_msg_addr();
+  var f = ds~load_msg_addr();
+  var o = ds~load_msg_addr();
+  var c = ds~load_int(32);
+  return begin_cell()
+    .store_slice(a)
+    .store_slice(f)
+    .store_slice(o)
+    .store_int(c, 32)
+    .end_cell();  ;; pack as cell, then convert to slice for tuple?
 }
 
-() save_data() inline {
+() save_state(slice a, slice f, slice o, int c) inline {
   var ds = begin_cell()
-    .store_slice(admin)
-    .store_slice(field_state_addr)
-    .store_slice(coherence_oracle_addr)
-    .store_int(commit_counter, 32)
+    .store_msg_addr(a)
+    .store_msg_addr(f)
+    .store_msg_addr(o)
+    .store_int(c, 32)
     .end_cell();
   set_data(ds);
 }
 
-() emit_event(int op, slice payload) inline {
-  var msg = begin_cell()
-    .store_uint(op, 8)
-    .store_slice(payload)
-    .end_cell();
-  send_raw_message(msg, 64);
+;; --------- HELPERS ---------
+
+(int) slices_eq(slice x, slice y) inline {
+  var cx = begin_cell().store_slice(x).end_cell();
+  var cy = begin_cell().store_slice(y).end_cell();
+  return (cell_hash(cx) == cell_hash(cy)) ? 1 : 0;
 }
 
-cell build_internal_message(slice addr, cell body) inline {
+cell build_int_msg(slice addr, cell body) inline {
   return begin_cell()
-    .store_uint(0x18, 6)
-    .store_slice(addr)
-    .store_grams(0)
+    .store_uint(0x18, 6)     ;; int_msg_info
+    .store_msg_addr(addr)
+    .store_coins(0)
     .store_uint(0, 1)
     .store_ref(body)
     .end_cell();
 }
 
-(int) receive_external_commit(slice in_msg) inline {
-  var source_chain = in_msg~load_uint(32);
-  var commitment_hash = in_msg~load_slice();
-  commit_counter += 1;
+() emit_event(int op, slice payload) inline {
+  var ev = begin_cell()
+    .store_uint(op, 8)
+    .store_slice(payload)
+    .end_cell();
+  send_raw_message(ev, 64);
+}
 
-  var body = begin_cell()
+tuple handle_external_commit(slice body, slice a, slice f, slice o, int counter) inline {
+  var source_chain = body~load_uint(32);
+  var commitment_hash = body~load_slice();
+
+  counter += 1;
+
+  var b = begin_cell()
     .store_uint(0x21, 8)
     .store_slice(commitment_hash)
     .end_cell();
-  var msg = build_internal_message(field_state_addr, body);
-  send_raw_message(msg, 1);
+  var m = build_int_msg(f, b);
+  send_raw_message(m, 1);
 
   var payload = begin_cell()
-    .store_int(commit_counter, 32)
+    .store_int(counter, 32)
     .store_uint(source_chain, 32)
     .store_slice(commitment_hash)
     .end_cell();
-  emit_event(OP_EXTERNAL_COMMIT, payload);
+  emit_event(0x11, payload);       ;; OP_EXTERNAL_COMMIT
 
-  return commit_counter;
+  ;; return updated state (a,f,o,c) packed as tuple-like cell
+  return begin_cell()
+    .store_slice(a)
+    .store_slice(f)
+    .store_slice(o)
+    .store_int(counter, 32)
+    .end_cell();
 }
 
-() apply_entanglement(slice in_msg) inline {
-  var target_shard = in_msg~load_uint(16);
-  var delta_energy = in_msg~load_int(64);
+tuple handle_entanglement(slice body, slice a, slice f, slice o, int counter) inline {
+  var target_shard = body~load_uint(16);
+  var delta_energy = body~load_int(64);
 
-  var body = begin_cell()
+  var b = begin_cell()
     .store_uint(0x31, 8)
     .store_uint(target_shard, 16)
     .store_int(delta_energy, 64)
     .end_cell();
-  var msg = build_internal_message(coherence_oracle_addr, body);
-  send_raw_message(msg, 1);
+  var m = build_int_msg(o, b);
+  send_raw_message(m, 1);
 
   var payload = begin_cell()
     .store_uint(target_shard, 16)
     .store_int(delta_energy, 64)
     .end_cell();
-  emit_event(OP_ENTANGLEMENT_APPLY, payload);
+  emit_event(0x13, payload);       ;; OP_ENTANGLEMENT_APPLY
+
+  return begin_cell()
+    .store_slice(a)
+    .store_slice(f)
+    .store_slice(o)
+    .store_int(counter, 32)
+    .end_cell();
 }
 
-() recv_internal(slice in_msg, int msg_value, cell msg_cell) impure {
-  load_data();
-  var op = in_msg~load_uint(8);
-  if (op == OP_EXTERNAL_COMMIT) {
-    receive_external_commit(in_msg);
-  } elseif (op == OP_ENTANGLEMENT_APPLY) {
-    apply_entanglement(in_msg);
+tuple read_sender_and_body(cell in_msg) inline {
+  var s = begin_parse(in_msg);
+  var _hdr = s~load_uint(1);            ;; 0 = int_msg_info
+  var _ihr_disabled = s~load_uint(1);
+  var _bounce       = s~load_uint(1);
+  var _bounced      = s~load_uint(1);
+  var src           = s~load_msg_addr();  ;; sender
+  var _dest         = s~load_msg_addr();  ;; dest
+  var _val          = s~load_grams();
+  var _ihr_fee      = s~load_grams();
+  var _fwd_fee      = s~load_grams();
+  var _lt           = s~load_uint(64);
+  var _at           = s~load_uint(32);
+  var body_cell     = s~load_ref();
+  var body_slice    = begin_parse(body_cell);
+
+  ;; pack (src, body_slice) into a cell (tuple-like)
+  return begin_cell()
+    .store_slice(src)
+    .store_slice(body_slice)
+    .end_cell();
+}
+
+() op_set_field_addr(slice body, slice sender, slice a, slice f, slice o, int c) inline {
+  if (slices_eq(sender, a) == 0) { throw(1001); }
+  f = body~load_msg_addr();
+  save_state(a, f, o, c);
+}
+
+() op_set_oracle_addr(slice body, slice sender, slice a, slice f, slice o, int c) inline {
+  if (slices_eq(sender, a) == 0) { throw(1002); }
+  o = body~load_msg_addr();
+  save_state(a, f, o, c);
+}
+
+;; --------- ENTRYPOINTS ---------
+
+() recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
+  ;; load_state -> tuple T = (a,f,o,c) packed in a cell
+  var st = load_state();
+  var st_slice = begin_parse(st);
+  var a = st_slice~load_slice();
+  var f = st_slice~load_slice();
+  var o = st_slice~load_slice();
+  var c = st_slice~load_int(32);
+
+  var op = in_msg_body~load_uint(8);
+
+  if (op == 0x11) {
+    var st2 = handle_external_commit(in_msg_body, a, f, o, c);
+    var s2 = begin_parse(st2);
+    var na = s2~load_slice();
+    var nf = s2~load_slice();
+    var no = s2~load_slice();
+    var nc = s2~load_int(32);
+    save_state(na, nf, no, nc);
+    return ();
+  } elseif (op == 0x13) {
+    var st3 = handle_entanglement(in_msg_body, a, f, o, c);
+    var s3 = begin_parse(st3);
+    var na2 = s3~load_slice();
+    var nf2 = s3~load_slice();
+    var no2 = s3~load_slice();
+    var nc2 = s3~load_int(32);
+    save_state(na2, nf2, no2, nc2);
+    return ();
+  } elseif (op == 0xA1 || op == 0xA2) {
+    var sb = read_sender_and_body(in_msg);
+    var sbp = begin_parse(sb);
+    var sender = sbp~load_slice();
+    var full_body = sbp~load_slice();
+    var admin_body = skip_bits(full_body, 8);  ;; skip opcode
+    if (op == 0xA1) {
+      op_set_field_addr(admin_body, sender, a, f, o, c);
+      return ();
+    } else {
+      op_set_oracle_addr(admin_body, sender, a, f, o, c);
+      return ();
+    }
   }
-  save_data();
+
+  return ();
 }
 
-() recv_external(slice in_msg) impure {}
+() recv_external(slice in_msg) impure {
+  return ();
+}
 
 () init(slice initial_admin, slice fs_addr, slice oracle_addr) impure {
-  admin = initial_admin;
-  field_state_addr = fs_addr;
-  coherence_oracle_addr = oracle_addr;
-  commit_counter = 0;
-  save_data();
-}
-
-const OP_SET_FIELD_ADDR  = 0xA1;
-const OP_SET_ORACLE_ADDR = 0xA2;
-
-(int) is_admin(slice addr) inline {
-  return (slice_bits(addr) == slice_bits(admin)) ? 1 : 0;
-}
-
-() set_field_state_addr(slice in_msg, slice sender) inline {
-  if (is_admin(sender) == 0) { throw(1001); }
-  field_state_addr = in_msg~load_msg_addr();
-}
-
-() set_coherence_oracle_addr(slice in_msg, slice sender) inline {
-  if (is_admin(sender) == 0) { throw(1002); }
-  coherence_oracle_addr = in_msg~load_msg_addr();
+  var a = initial_admin;
+  var f = fs_addr;
+  var o = oracle_addr;
+  var c = 0;
+  save_state(a, f, o, c);
+  return ();
 }
