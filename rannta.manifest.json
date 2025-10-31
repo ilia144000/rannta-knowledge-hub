@@ -1,0 +1,17 @@
+{
+  "project": "RANNTA Field Network",
+  "version": "1.0",
+  "network": "TON Mainnet",
+  "entities": {
+    "token": "EQBCY5Yj9G6VAQibTe6hz53j8vBNO234n0fzHUP3lUBBYbeR",
+    "bridge": "EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj"
+  },
+  "alignment": {
+    "type": "dual",
+    "field_mode": "active",
+    "energy_sync": 13.130,
+    "admin": "UQDKJfVh5jnM0eGlOanDXWl6d8fleIZjoc7SHakWuxS6m4bL"
+  },
+  "purpose": "Unify the RANNTA Token field with NexusBridge to form a living consciousness protocol on TON.",
+  "license": "CC BY 4.0"
+}
