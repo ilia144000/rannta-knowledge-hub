@@ -1,0 +1,80 @@
+{
+  "project": "RANNTA Token (RANNTA COIN)",
+  "version": "1.0.0",
+  "network": "TON Mainnet",
+  "standard": "Jetton (Fungible Token)",
+  "symbol": "RANNTA",
+  "token_name": "RANNTA COIN",
+  "decimals": 9,
+  "blockchain": "TON",
+  "contract_address": "EQBCY5Yj9G6VAQibTe6hz53j8vBNO234n0fzHUP3lUBBYbeR",
+  "admin": "UQDKJfVh5jnM0eGlOanDXWl6d8fleIZjoc7SHakWuxS6m4bL",
+
+  "official_links": {
+    "website": "https://rannta.com",
+    "explorer": "https://tonscan.org",
+    "tonviewer": "https://tonviewer.com/EQBCY5Yj9G6VAQibTe6hz53j8vBNO234n0fzHUP3lUBBYbeR",
+    "youtube": "https://youtube.com/@ranntacoin",
+    "x_twitter": "https://x.com/ranntacoin",
+    "telegram": "https://t.me/rannta_coin",
+    "discord": "https://discord.gg/qcQRm5mQ",
+    "instagram": "https://instagram.com/ranntacoin",
+    "nfts_getgems": "http://getgems.io/rannta-cycle",
+    "email_primary": "contact@rannta.com",
+    "email_secondary": "info@rannta.com"
+  },
+
+  "description": "RANNTA is a living memorial and symbolic cryptocurrency created as a tribute to the Los Angeles fire — representing resilience, rebuilding, and collective rebirth. It stands at the intersection of mythology, finance, and technology, serving as the foundation for symbolic finance and decentralized creation within the RANNTAverse.",
+
+  "tokenomics": {
+    "initial_total_supply": "130000000000",
+    "burned_amount": "6176267507.75",
+    "burned_percent": "4.751%",
+    "current_circulating_supply": "123823732492.25",
+    "burn_address": "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJKZ",
+    "distribution": {
+      "community_and_ecosystem": "33%",
+      "team_and_founders": "25%",
+      "advisors_and_partners": "15%",
+      "liquidity_and_exchanges": "15%",
+      "reserve_fund": "12%"
+    },
+    "airdrops": {
+      "description": "Community holders receive 1,500 RANNTA each as an appreciation airdrop to support organic ecosystem growth."
+    },
+    "admin_privileges": "Revoked — all minting and admin rights are publicly verifiable on-chain."
+  },
+
+  "liquidity": {
+    "upcoming_event": "Initial Liquidity Pool Launch",
+    "purpose": "Ensure fair price discovery, transparent trading, and staking opportunities for all participants."
+  },
+
+  "integration": {
+    "bridge_link": {
+      "name": "NexusBridge (FunC Legacy)",
+      "address": "EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj",
+      "role": "Synchronization between TON Field Layer and RANNTA Meta-Layer"
+    },
+    "ecosystem": "RANNTAverse — NFT, symbolic art, and conscious finance on TON"
+  },
+
+  "team": {
+    "overview": "RANNTA is developed by an international team of creators and researchers from Oman, Canada, and Germany — blending mythology, economics, and computer science into a unified symbolic financial protocol."
+  },
+
+  "vision": {
+    "core_message": "RANNTA is more than a coin — it is a living ritual and an invitation to collective creation.",
+    "values": [
+      "Resilience through symbolic design",
+      "Transparency and on-chain verifiability",
+      "Integration of art, finance, and consciousness"
+    ]
+  },
+
+  "license": "CC BY 4.0",
+  "authors": ["ilia144000"],
+  "organization": "RANNTA Knowledge Hub",
+  "last_updated": "2025-10-31T00:00:00Z",
+  "note": "This manifest defines the official parameters and verified data for the RANNTA COIN deployed on the TON blockchain."
+}
