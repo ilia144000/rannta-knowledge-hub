@@ -41,6 +41,18 @@ You are free to **share** and **adapt** the material for any purpose, even comme
 Full license text:  
 👉 [https://creativecommons.org/licenses/by/4.0/legalcode](https://creativecommons.org/licenses/by/4.0/legalcode)
 
+## NexusBridge — TON Mainnet (FunC legacy)
+
+Deployed: `EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj`  
+Admin: `UQDKJfVh5jnM0eGlOanDXWl6d8fleIZjoc7SHakWuxS6m4bL`
+
+**What’s live:** On-chain state with `admin / field_state / oracle / commit_counter`.  
+**Admin ops:** `0xA1 set_field_state`, `0xA2 set_oracle`.  
+**Signals:** `0x11 external_commit`, `0x13 entanglement_apply`.
+
+Machine-readable: see `nexusbridge.manifest.json`.  
+License: CC BY 4.0.
+
 **Recommended credit format:**
 > Portions of this work are derived from “RANNTA Knowledge Hub — ilia144000” (© 2025 ilia144000), licensed under CC BY 4.0. Changes were made.
 
