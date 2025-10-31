@@ -30,5 +30,17 @@
 - **Set Oracle:** body = `uint8(0xA2) + msg_address(newOracle)`.
 Send as an *internal* message with a small value (e.g., 0.05 TON).
 
-## License
-MIT (see LICENSE).
+## 🪶 License & Attribution
+
+This project is licensed under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** License.  
+You are free to **share** and **adapt** the material for any purpose, even commercially, under the following terms:
+
+- **Attribution:** You must give appropriate credit to **“RANNTA Knowledge Hub — ilia144000”**, provide a link to the license, and indicate if changes were made.  
+- **No additional restrictions:** You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+Full license text:  
+👉 [https://creativecommons.org/licenses/by/4.0/legalcode](https://creativecommons.org/licenses/by/4.0/legalcode)
+
+**Recommended credit format:**
+> Portions of this work are derived from “RANNTA Knowledge Hub — ilia144000” (© 2025 ilia144000), licensed under CC BY 4.0. Changes were made.
+
