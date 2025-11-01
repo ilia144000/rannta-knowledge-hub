@@ -5,10 +5,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -66,7 +69,8 @@ EOF
           [ -n "$TON_TESTNET_MNEMONIC" ] || (echo "MNEMONIC secret empty"; exit 3)
           mkdir -p ~/.config/blueprint
           echo "$TON_TESTNET_MNEMONIC" | blueprint keys import --network testnet --stdin
-          echo ">>> Testnet address:"; blueprint keys show --network testnet
+          echo ">>> Testnet address:"
+          blueprint keys show --network testnet
 
       - name: Build
         run: blueprint build
@@ -76,8 +80,7 @@ EOF
 
       - name: Extract & Upload Address
         run: |
-          grep -R "NexusBridge deployed at:" -n . -R || true
-          LOG=$(grep -h "NexusBridge deployed at:" -R ~/.cache -R || true)
+          LOG=$(grep -h "NexusBridge deployed at:" -R ~/.cache || true)
           echo "$LOG" > deploy-address.txt || true
           echo "If empty, scroll logs for 'NexusBridge deployed at:'"
         continue-on-error: true
