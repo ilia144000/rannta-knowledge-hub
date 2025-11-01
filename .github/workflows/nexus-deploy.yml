@@ -1,38 +1,42 @@
 name: Deploy NexusBridge to TON Testnet
-on: { workflow_dispatch: {} }
+on:
+  workflow_dispatch: {}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with: { node-version: 20 }
+      - uses: actions/checkout@v4
 
-    - name: Install Blueprint CLI
-      run: npm i -g @ton-community/blueprint @ton/core
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    - name: Ensure blueprint.config.ts
-      run: |
-        if [ ! -f "blueprint.config.ts" ]; then
-          cat > blueprint.config.ts <<'EOF'
-          import { NetworkProvider } from "@ton/blueprint";
-          export const compile = {
-            nexus: { language: "func", targets: ["contracts/ton/NexusBridge.fc"] },
-          };
-          export async function run(provider: NetworkProvider) {}
-          EOF
-        fi
+      - name: Install Blueprint CLI
+        run: npm i -g @ton-community/blueprint @ton/core
 
-    - name: Verify contract file
-      run: test -f contracts/ton/NexusBridge.fc
+      - name: Ensure blueprint.config.ts
+        run: |
+          if [ ! -f "blueprint.config.ts" ]; then
+            cat > blueprint.config.ts <<'EOF'
+            import { NetworkProvider } from "@ton/blueprint";
+            export const compile = {
+              nexus: { language: "func", targets: ["contracts/ton/NexusBridge.fc"] },
+            };
+            export async function run(provider: NetworkProvider) {}
+            EOF
+          fi
 
-    - name: Ensure scripts/deployNexus.ts and patch ADMIN
-      env: { ADMIN: ${{ secrets.TON_TESTNET_ADMIN }} }
-      run: |
-        mkdir -p scripts
-        if [ ! -f "scripts/deployNexus.ts" ]; then
-          cat > scripts/deployNexus.ts <<'EOF'
+      - name: Verify contract file
+        run: test -f contracts/ton/NexusBridge.fc
+
+      - name: Ensure scripts/deployNexus.ts and patch ADMIN
+        env:
+          ADMIN: ${{ secrets.TON_TESTNET_ADMIN }}
+        run: |
+          mkdir -p scripts
+          if [ ! -f "scripts/deployNexus.ts" ]; then
+            cat > scripts/deployNexus.ts <<'EOF'
 // scripts/deployNexus.ts
 import { Address, beginCell, toNano } from "@ton/core";
 import { compile, NetworkProvider } from "@ton/blueprint";
@@ -51,32 +55,36 @@ export async function run(provider: NetworkProvider) {
   console.log("NexusBridge deployed at:", contract.address.toString());
 }
 EOF
-        fi
-        [ -n "$ADMIN" ] || (echo "ADMIN secret empty"; exit 2)
-        sed -i 's#Address.parse("YOUR_TESTNET_WALLET_ADDRESS")#Address.parse("'$ADMIN'")#' scripts/deployNexus.ts
+          fi
+          [ -n "$ADMIN" ] || (echo "ADMIN secret empty"; exit 2)
+          sed -i 's#Address.parse("YOUR_TESTNET_WALLET_ADDRESS")#Address.parse("'$ADMIN'")#' scripts/deployNexus.ts
 
-    - name: Import Testnet Mnemonic
-      env: { TON_TESTNET_MNEMONIC: ${{ secrets.TON_TESTNET_MNEMONIC }} }
-      run: |
-        [ -n "$TON_TESTNET_MNEMONIC" ] || (echo "MNEMONIC secret empty"; exit 3)
-        mkdir -p ~/.config/blueprint
-        echo "$TON_TESTNET_MNEMONIC" | blueprint keys import --network testnet --stdin
-        echo ">>> Testnet address:"; blueprint keys show --network testnet
+      - name: Import Testnet Mnemonic
+        env:
+          TON_TESTNET_MNEMONIC: ${{ secrets.TON_TESTNET_MNEMONIC }}
+        run: |
+          [ -n "$TON_TESTNET_MNEMONIC" ] || (echo "MNEMONIC secret empty"; exit 3)
+          mkdir -p ~/.config/blueprint
+          echo "$TON_TESTNET_MNEMONIC" | blueprint keys import --network testnet --stdin
+          echo ">>> Testnet address:"; blueprint keys show --network testnet
 
-    - name: Build
-      run: blueprint build
+      - name: Build
+        run: blueprint build
 
-    - name: Deploy
-      run: blueprint run scripts/deployNexus.ts --network testnet
+      - name: Deploy
+        run: blueprint run scripts/deployNexus.ts --network testnet
 
-    - name: Extract & Upload Address
-      run: |
-        grep -R "NexusBridge deployed at:" -n . -R || true
-        LOG=$(grep -h "NexusBridge deployed at:" -R ~/.cache -R || true)
-        echo "$LOG" > deploy-address.txt || true
-        echo "If empty, scroll logs for 'NexusBridge deployed at:'"
-      continue-on-error: true
+      - name: Extract & Upload Address
+        run: |
+          grep -R "NexusBridge deployed at:" -n . -R || true
+          LOG=$(grep -h "NexusBridge deployed at:" -R ~/.cache -R || true)
+          echo "$LOG" > deploy-address.txt || true
+          echo "If empty, scroll logs for 'NexusBridge deployed at:'"
+        continue-on-error: true
 
-    - name: Upload Artifact (address)
-      uses: actions/upload-artifact@v4
-      with: { name: nexus-address, path: deploy-address.txt, if-no-files-found: warn }
+      - name: Upload Artifact (address)
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-address
+          path: deploy-address.txt
+          if-no-files-found: warn
