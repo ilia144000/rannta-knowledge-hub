@@ -5,6 +5,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout
@@ -20,14 +23,14 @@ jobs:
 
       - name: Ensure blueprint.config.ts
         run: |
-          if [ ! -f "blueprint.config.ts" ]; then
-            printf '%s\n' \
-'import { NetworkProvider } from "@ton/blueprint";' \
-'export const compile = {' \
-'  nexus: { language: "func", targets: ["contracts/ton/NexusBridge.fc"] },' \
-'};' \
-'export async function run(provider: NetworkProvider) {}' \
-            > blueprint.config.ts
+          if [ ! -f blueprint.config.ts ]; then
+            cat <<'EOF' > blueprint.config.ts
+import { NetworkProvider } from "@ton/blueprint";
+export const compile = {
+  nexus: { language: "func", targets: ["contracts/ton/NexusBridge.fc"] },
+};
+export async function run(provider: NetworkProvider) {}
+EOF
           fi
 
       - name: Verify contract file
@@ -38,35 +41,41 @@ jobs:
           ADMIN: ${{ secrets.TON_TESTNET_ADMIN }}
         run: |
           mkdir -p scripts
-          if [ ! -f "scripts/deployNexus.ts" ]; then
-            printf '%s\n' \
-// scripts/deployNexus.ts \
-'import { Address, beginCell, toNano } from "@ton/core";' \
-'import { compile, NetworkProvider } from "@ton/blueprint";' \
-'function noneSlice(){ return beginCell().endCell().beginParse(); }' \
-'export async function run(provider: NetworkProvider) {' \
-'  const code = await compile("nexus");' \
-'  const ADMIN = Address.parse("YOUR_TESTNET_WALLET_ADDRESS");' \
-'  const data = beginCell()' \
-'    .storeSlice(beginCell().storeAddress(ADMIN).endCell().beginParse())' \
-'    .storeSlice(noneSlice())' \
-'    .storeSlice(noneSlice())' \
-'    .storeInt(0, 32)' \
-'    .endCell();' \
-'  const contract = provider.openContractFromCode(code, data);' \
-'  await contract.sendDeploy(provider.sender(), toNano("0.05"));' \
-'  console.log("NexusBridge deployed at:", contract.address.toString());' \
-'}' \
-            > scripts/deployNexus.ts
+          if [ ! -f scripts/deployNexus.ts ]; then
+            cat <<'EOF' > scripts/deployNexus.ts
+// scripts/deployNexus.ts
+import { Address, beginCell, toNano } from "@ton/core";
+import { compile, NetworkProvider } from "@ton/blueprint";
+function noneSlice(){ return beginCell().endCell().beginParse(); }
+export async function run(provider: NetworkProvider) {
+  const code = await compile("nexus");
+  const ADMIN = Address.parse("YOUR_TESTNET_WALLET_ADDRESS");
+  const data = beginCell()
+    .storeSlice(beginCell().storeAddress(ADMIN).endCell().beginParse())
+    .storeSlice(noneSlice())
+    .storeSlice(noneSlice())
+    .storeInt(0, 32)
+    .endCell();
+  const contract = provider.openContractFromCode(code, data);
+  await contract.sendDeploy(provider.sender(), toNano("0.05"));
+  console.log("NexusBridge deployed at:", contract.address.toString());
+}
+EOF
           fi
-          if [ -z "$ADMIN" ]; then echo "ADMIN secret empty"; exit 2; fi
+
+          if [ -z "$ADMIN" ]; then
+            echo "ADMIN secret empty"; exit 2
+          fi
+
           sed -i 's#Address.parse("YOUR_TESTNET_WALLET_ADDRESS")#Address.parse("'$ADMIN'")#' scripts/deployNexus.ts
 
       - name: Import Testnet Mnemonic
         env:
           TON_TESTNET_MNEMONIC: ${{ secrets.TON_TESTNET_MNEMONIC }}
         run: |
-          if [ -z "$TON_TESTNET_MNEMONIC" ]; then echo "MNEMONIC secret empty"; exit 3; fi
+          if [ -z "$TON_TESTNET_MNEMONIC" ]; then
+            echo "MNEMONIC secret empty"; exit 3
+          fi
           mkdir -p ~/.config/blueprint
           echo "$TON_TESTNET_MNEMONIC" | blueprint keys import --network testnet --stdin
           echo ">>> Testnet address:"
