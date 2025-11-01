@@ -1,12 +1,86 @@
-name: Nexus Smoke
+name: Deploy NexusBridge to TON Testnet
 on:
   workflow_dispatch: {}
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Echo
-        run: echo "ok"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Blueprint CLI
+        run: npm i -g @ton-community/blueprint @ton/core
+
+      - name: Verify contract file
+        run: test -f contracts/ton/NexusBridge.fc
+
+      - name: Create blueprint.config.ts (if missing)
+        run: |
+          if [ ! -f blueprint.config.ts ]; then
+            echo 'import { NetworkProvider } from "@ton/blueprint";' > blueprint.config.ts
+            echo 'export const compile = {' >> blueprint.config.ts
+            echo '  nexus: { language: "func", targets: ["contracts/ton/NexusBridge.fc"] },' >> blueprint.config.ts
+            echo '};' >> blueprint.config.ts
+            echo 'export async function run(provider: NetworkProvider) {}' >> blueprint.config.ts
+          fi
+
+      - name: Create scripts/deployNexus.ts and patch ADMIN
+        env:
+          ADMIN: ${{ secrets.TON_TESTNET_ADMIN }}
+        run: |
+          mkdir -p scripts
+          rm -f scripts/deployNexus.ts
+          echo '// scripts/deployNexus.ts' > scripts/deployNexus.ts
+          echo 'import { Address, beginCell, toNano } from "@ton/core";' >> scripts/deployNexus.ts
+          echo 'import { compile, NetworkProvider } from "@ton/blueprint";' >> scripts/deployNexus.ts
+          echo 'function noneSlice(){ return beginCell().endCell().beginParse(); }' >> scripts/deployNexus.ts
+          echo 'export async function run(provider: NetworkProvider) {' >> scripts/deployNexus.ts
+          echo '  const code = await compile("nexus");' >> scripts/deployNexus.ts
+          echo '  const ADMIN = Address.parse("YOUR_TESTNET_WALLET_ADDRESS");' >> scripts/deployNexus.ts
+          echo '  const data = beginCell()' >> scripts/deployNexus.ts
+          echo '    .storeSlice(beginCell().storeAddress(ADMIN).endCell().beginParse())' >> scripts/deployNexus.ts
+          echo '    .storeSlice(noneSlice())' >> scripts/deployNexus.ts
+          echo '    .storeSlice(noneSlice())' >> scripts/deployNexus.ts
+          echo '    .storeInt(0, 32)' >> scripts/deployNexus.ts
+          echo '    .endCell();' >> scripts/deployNexus.ts
+          echo '  const contract = provider.openContractFromCode(code, data);' >> scripts/deployNexus.ts
+          echo '  await contract.sendDeploy(provider.sender(), toNano("0.05"));' >> scripts/deployNexus.ts
+          echo '  console.log("NexusBridge deployed at:", contract.address.toString());' >> scripts/deployNexus.ts
+          echo '}' >> scripts/deployNexus.ts
+          if [ -z "$ADMIN" ]; then echo "ADMIN secret empty"; exit 2; fi
+          sed -i 's#Address.parse("YOUR_TESTNET_WALLET_ADDRESS")#Address.parse("'$ADMIN'")#' scripts/deployNexus.ts
+
+      - name: Import Testnet Mnemonic
+        env:
+          TON_TESTNET_MNEMONIC: ${{ secrets.TON_TESTNET_MNEMONIC }}
+        run: |
+          if [ -z "$TON_TESTNET_MNEMONIC" ]; then echo "MNEMONIC secret empty"; exit 3; fi
+          mkdir -p ~/.config/blueprint
+          echo "$TON_TESTNET_MNEMONIC" | blueprint keys import --network testnet --stdin
+          echo ">>> Testnet address:"; blueprint keys show --network testnet
+
+      - name: Build
+        run: blueprint build
+
+      - name: Deploy
+        run: blueprint run scripts/deployNexus.ts --network testnet
+
+      - name: Extract & Upload Address
+        run: |
+          LOG=$(grep -h "NexusBridge deployed at:" -R ~/.cache || true)
+          echo "$LOG" > deploy-address.txt || true
+          echo "If empty, scroll logs for the phrase above."
+        continue-on-error: true
+
+      - name: Upload Artifact (address)
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-address
+          path: deploy-address.txt
+          if-no-files-found: warn
