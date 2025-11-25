@@ -1,4 +1,10 @@
 <p align="center">
+  <img src="docs/banner_nexusbridge_animated.svg" width="880" alt="RANNTA NexusBridge Animated Banner"/>
+</p>
+
+<br/>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/ton-blockchain/assets/master/logo-ton.png" width="120" />
 </p>
 
