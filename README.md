@@ -159,7 +159,6 @@ git add nexusbridge.manifest.json
 git commit -m "Auto-sync manifest"
 
 🪶 License
-
 Creative Commons Attribution 4.0 International (CC BY 4.0)
 Attribution required: "RANNTA Knowledge Hub — ilia144000"
 
