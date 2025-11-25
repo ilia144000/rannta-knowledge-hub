@@ -2,10 +2,8 @@
   <img src="docs/banner_nexusbridge_animated.svg" width="880" alt="RANNTA NexusBridge Animated Banner"/>
 </p>
 
-<br/>
-
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ton-blockchain/assets/master/logo-ton.png" width="120" />
+  <img src="https://raw.githubusercontent.com/ton-blockchain/assets/master/logo-ton.png" width="120" alt="TON Logo"/>
 </p>
 
 <h1 align="center">🌉 NexusBridge — RANNTA Field Sync Node</h1>
@@ -24,7 +22,7 @@
 ## 🧩 Overview
 
 **NexusBridge** is the synchronization node that links the **RANNTA token** to its **coherence oracle layer** on the TON blockchain.  
-It emits deterministic commit events, maintains a minimal state, and enables symbolic-field alignment between on-chain and oracle layers.
+It emits deterministic commit events, maintains minimal state, and enables symbolic-field alignment between on-chain and oracle layers.
 
 Designed for:
 
@@ -50,27 +48,27 @@ Designed for:
 
 ## 🎛 Architecture Diagram (ASCII)
 
-            ┌──────────────────────┐
-            │    RANNTA Token      │
-            │ (Jetton Master State)│
-            └──────────┬───────────┘
-                       │
-                       │ field_state
-                       ▼
-             ┌──────────────────────┐
-             │    NexusBridge       │
-             │ (FunC Sync Node)     │
-             ├──────────────────────┤
-             │ admin           ●    │
-             │ oracle          ●    │
-             │ commit_counter  ●    │
-             └──────────┬───────────┘
-                       │ commits
-                       ▼
-            ┌────────────────────────┐
-            │     Oracle Layer       │
-            │ (Coherence Node)       │
-            └────────────────────────┘
+        ┌──────────────────────┐
+        │    RANNTA Token      │
+        │ (Jetton Master State)│
+        └──────────┬───────────┘
+                   │
+                   │ field_state
+                   ▼
+         ┌──────────────────────┐
+         │    NexusBridge       │
+         │   (FunC Sync Node)   │
+         ├──────────────────────┤
+         │ admin           ●    │
+         │ oracle          ●    │
+         │ commit_counter  ●    │
+         └──────────┬───────────┘
+                   │ commits
+                   ▼
+        ┌────────────────────────┐
+        │     Oracle Layer       │
+        │   (Coherence Node)     │
+        └────────────────────────┘
 
 ---
 
@@ -109,37 +107,24 @@ build/
 
 nexusbridge.manifest.json # Metadata descriptor
 
-
 ---
 
 ## 🧪 Message Examples
 
 ### External Commit
-
-
-
 op: 0x11
 counter: 42
 source_chain: 1
 commitment_hash: <32-byte-slice>
 
-
 ### Set Oracle (admin only)
-
-
-
 op: 0xA2
 oracle: <MsgAddress>
 
-
 ### Entanglement Apply
-
-
-
 op: 0x13
 target_shard: 3
 delta_energy: -50000
-
 
 ---
 
@@ -168,7 +153,7 @@ toncli deploy \
   --address EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj \
   --value 0.5
 
-🔄 Manifest Auto-Sync Script
+Manifest Auto-Sync Script
 node scripts/generate-manifest.js
 git add nexusbridge.manifest.json
 git commit -m "Auto-sync manifest"
