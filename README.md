@@ -2,10 +2,6 @@
   <img src="docs/banner_nexusbridge_animated.svg" width="880" alt="RANNTA NexusBridge Animated Banner"/>
 </p>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ton-blockchain/assets/master/logo-ton.png" width="120" alt="TON Logo"/>
-</p>
-
 <h1 align="center">🌉 NexusBridge — RANNTA Field Sync Node</h1>
 <p align="center">Legacy FunC Edition • TON Mainnet • RANNTA Knowledge Hub</p>
 
