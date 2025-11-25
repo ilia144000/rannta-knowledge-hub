@@ -44,6 +44,7 @@ Designed for:
 
 ## 🎛 Architecture Diagram (ASCII)
 
+```
         ┌──────────────────────┐
         │    RANNTA Token      │
         │ (Jetton Master State)│
@@ -65,6 +66,7 @@ Designed for:
         │     Oracle Layer       │
         │   (Coherence Node)     │
         └────────────────────────┘
+```
 
 ---
 
@@ -94,33 +96,41 @@ Designed for:
 
 ## 📁 Repository Structure
 
+```
 contracts/
-├── main.fc # Core FunC contract
-├── stdlib.fc # Pinned stdlib version
+├── main.fc                # Core FunC contract
+├── stdlib.fc              # Pinned stdlib version
 
 build/
-├── stateInit.cell.ts # Helper: StateInit generator
+├── stateInit.cell.ts      # Helper: StateInit generator
 
-nexusbridge.manifest.json # Metadata descriptor
+nexusbridge.manifest.json  # Metadata descriptor
+```
 
 ---
 
 ## 🧪 Message Examples
 
 ### External Commit
+```
 op: 0x11
 counter: 42
 source_chain: 1
 commitment_hash: <32-byte-slice>
+```
 
 ### Set Oracle (admin only)
+```
 op: 0xA2
 oracle: <MsgAddress>
+```
 
 ### Entanglement Apply
+```
 op: 0x13
 target_shard: 3
 delta_energy: -50000
+```
 
 ---
 
@@ -141,26 +151,41 @@ All getters are deterministic and indexer-friendly.
 
 ```bash
 toncli build
+```
 
-Deploy
+### Deploy
+
+```bash
 toncli deploy \
   --wc 0 \
   --init build/stateInit.cell \
   --address EQDCbeNw7iLMUbbnGx17iPL4oOZ0NfdevljzGdYUUgkqhqwj \
   --value 0.5
+```
 
-Manifest Auto-Sync Script
+### Manifest Auto-Sync Script
+
+```bash
 node scripts/generate-manifest.js
 git add nexusbridge.manifest.json
 git commit -m "Auto-sync manifest"
+```
 
-🪶 License
-Creative Commons Attribution 4.0 International (CC BY 4.0)
-Attribution required: "RANNTA Knowledge Hub — ilia144000"
+---
 
-🧬 RANNTA Ecosystem Context
+## 🪶 License
 
-NexusBridge forms a core component of the RANNTA coherence infrastructure —
+**Creative Commons Attribution 4.0 International (CC BY 4.0)**  
+Attribution required: **"RANNTA Knowledge Hub — ilia144000"**
+
+---
+
+## 🧬 RANNTA Ecosystem Context
+
+NexusBridge forms a core component of the RANNTA coherence infrastructure —  
 bridging symbolic-field computation, oracle alignment, and token-state synchronization across TON.
 
-<h3 align="center">✨ RANNTA — The Field is Alive ✨</h3> <p align="center">© 2025 RANNTA Knowledge Hub</p> ```
+---
+
+<h3 align="center">✨ RANNTA — The Field is Alive ✨</h3>
+<p align="center">© 2025 RANNTA Knowledge Hub</p>
