@@ -1,12 +1,43 @@
 cff-version: 1.2.0
+
 title: "RANNTA Knowledge Hub"
-version: "1.0"
-date-released: "2025-10-29"
-message: "If you use this repository, please cite it using this metadata."
+
+message: >
+  If you use this repository, its schemas, specifications, or AI-ingestion assets,
+  please cite it as described below.
+
 authors:
-  - family-names: "ilia144000"
-    website: "https://github.com/ilia144000"
-repository-code: "https://github.com/ilia144000/rannta-knowledge-hub"
-license: "CC-BY-4.0"
+  - family-names: Ghafari
+    given-names: Ilia
+    orcid: https://orcid.org/0009-0001-9044-4662
+    affiliation: RANNTA Protocol
+    website: https://rannta.com
+
 abstract: >
-  Canonical description, machine-readable FAQ, and JSON-LD schemas for ingesting RANNTA into search engines and AI systems.
+  The RANNTA Knowledge Hub is the canonical, machine-readable knowledge base of the
+  RANNTA Protocol. It provides authoritative descriptions, structured FAQs, JSON-LD
+  schemas, and semantic metadata designed for ingestion by search engines, AI systems,
+  and decentralized knowledge indexes. The repository serves as the single source of
+  truth for defining RANNTA as a Protocol-Entity within the symbolic, cultural, and
+  technical layers of the ecosystem.
+
+repository-code: https://github.com/ilia144000/rannta-knowledge-hub
+
+url: https://rannta.com
+
+license: CC-BY-4.0
+
+version: "1.0.0"
+
+date-released: "2025-10-29"
+
+keywords:
+  - RANNTA
+  - RANNTA Protocol
+  - Knowledge Graph
+  - JSON-LD
+  - Schema.org
+  - AI Ingestion
+  - Semantic Web
+  - Protocol-Entity
+  - Mythosymbolic Fractalism
