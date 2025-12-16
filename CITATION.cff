@@ -1,4 +1,5 @@
 cff-version: 1.2.0
+type: dataset
 title: "RANNTA Knowledge Hub"
 message: "If you use this knowledge base or its schemas, please cite it as below."
 authors:
@@ -7,12 +8,13 @@ authors:
     orcid: https://orcid.org/0009-0001-9044-4662
 repository-code: https://github.com/ilia144000/rannta-knowledge-hub
 url: https://rannta.com/authoritative.html
-license: CC-BY-4.0
+license: "CC-BY-4.0"
 version: "1.0.0"
 date-released: "2025-10-29"
 abstract: >
   Canonical descriptions, machine-readable documentation, and JSON-LD / Schema.org
-  knowledge graph definitions for ingesting RANNTA into search engines and AI systems.
+  knowledge graph definitions for structured discovery and interpretation of RANNTA
+  by search engines and AI systems.
 keywords:
   - RANNTA
   - Knowledge Graph
