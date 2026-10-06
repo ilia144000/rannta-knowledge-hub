@@ -1,3 +1,6 @@
+> **Historical symbolic-layer notice.**
+> The language below describes RANNTA's creative/symbolic layer. It is not the current technical definition of the RANNTA ecosystem, RANNTA X-Chain, RNTX or the TON-based RANNTA Jetton. Current identity: https://rannta.com/identity.json
+
 🪙 RANNTA Token — TON Mainnet
 
 Status: Active — Conscious Value Layer
